@@ -39,8 +39,16 @@ class Car:
         car_rect = pygame.Rect(self.x, self.y, 30, 50)
         pygame.draw.rect(screen, self.color, car_rect)
 
+    # Neural Network outputs: [left, right, accelerate, decelerate]
     def move(self, output):
-        pass
+        if output[0] > 0.5:
+            self.x -= 2
+        if output[1] > 0.5:
+            self.x += 2
+        if output[2] > 0.5:
+            self.y -= 3
+        if output[3] > 0.5:
+            self.y += 3
 
 def eval_genomes(genomes, config):
     pass
