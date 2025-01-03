@@ -36,7 +36,8 @@ class Car:
         self.fitness = 0
 
     def draw(self):
-        pass
+        car_rect = pygame.Rect(self.x, self.y, 30, 50)
+        pygame.draw.rect(screen, self.color, car_rect)
 
     def move(self, output):
         pass
