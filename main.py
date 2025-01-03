@@ -103,4 +103,25 @@ def eval_genomes(genomes, config):
 
 
 def run_neat(config_file):
-    pass
+    config = neat.config.Config(
+        neat.DefaultGenome,
+        neat.DefaultReproduction,
+        neat.DefaultSpeciesSet,
+        neat.DefaultStagnation,
+        config_file
+    )
+    p = neat.Population(config)
+
+    p.add_reporter(neat.StdOutReporter(True))
+    stats = neat.StatisticsReporter()
+    p.add_reporter(stats)
+
+    # Run NEAT for 50 generations
+    winner = p.run(eval_genomes, 50)
+
+    print("\nBest genome:\n{!s}".format(winner))
+
+if __name__ == "__main__":
+    local_dir = os.path.dirname(__file__)
+    config_path = os.path.join(local_dir, "config.txt")
+    run_neat(config_path)
