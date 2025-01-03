@@ -37,3 +37,12 @@ class Car:
 
     def draw(self):
         pass
+
+    def move(self, output):
+        pass
+
+def eval_genomes(genomes, config):
+    pass
+
+def run_neat(config_file):
+    pass
