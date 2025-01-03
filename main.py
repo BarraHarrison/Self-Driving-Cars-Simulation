@@ -60,7 +60,47 @@ class Car:
 
 
 def eval_genomes(genomes, config):
-    pass
+    global current_map_index
+
+    cars = []
+    nets = []
+    for genome_id, genome in genomes:
+        net = neat.nn.FeedForwardNetwork.create(genome, config)
+        nets.append(net)
+        cars.append(Car(400, 500, BLUE))
+        genome.fitness = 0
+
+    running = True
+    while running:
+        screen.fill(WHITE)
+        screen.blit(maps[current_map_index], (0, 0))
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+
+        for i, car in enumerate(cars):
+            inputs = [
+                car.x / SCREEN_WIDTH,
+                car.y / SCREEN_HEIGHT,
+                current_map_index / len(maps),
+                random.random(), #Placeholder sensor input
+                random.random(),
+            ]
+            output = nets[i].activate(inputs)
+            car.move(output)
+
+            # Check collisions with the map
+            if car.y < 0:
+                genomes[i][1].fitness += 1000
+                running = False
+
+            car.draw()
+
+        pygame.display.flip()
+        clock.tick(30)
+
 
 def run_neat(config_file):
     pass
