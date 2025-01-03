@@ -23,3 +23,17 @@ clock = pygame.time.Clock()
 maps = [
     pygame.image.load(f"map{i}.png").convert() for i in range(1, 6)
 ]
+
+current_map_index = 0
+
+class Car:
+    def __init__(self, x, y, color):
+        self.x = x
+        self.y = y
+        self.color = color
+        self.speed = 3
+        self.angle = 0
+        self.fitness = 0
+
+    def draw(self):
+        pass
