@@ -50,6 +50,15 @@ class Car:
         if output[3] > 0.5:
             self.y += 3
 
+        # Keep car within screen boundaries
+        self.x = max(0, min(SCREEN_WIDTH - 30, self.x))
+        self.y = max(0, min(SCREEN_HEIGHT - 50, self.y))
+
+        # Increment improvement (fitness) for moving forward
+        # Survival of the fittest if you will
+        self.fitness += 1
+
+
 def eval_genomes(genomes, config):
     pass
 
