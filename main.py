@@ -63,7 +63,25 @@ class Car:
         return car_color != BLACK
 
     def cast_sensors(self, map_image):
-        pass
+        self.sensors = []
+        sensor_angles = [-60, -30, 0, 30, 60]
+        for angle in sensor_angles:
+            sensor_angle = self.angle + angle
+            for dist in range(0, 200, 5): # 200 pixels sensor range
+                x = int(self.x + dist * math.cos(math.radians(sensor_angle)))
+                y = int(self.y - dist * math.sin(math.radians(sensor_angle)))
+
+                # Stop if out of bounds
+                if x < 0 or x >= SCREEN_WIDTH or y < 0 or y >= SCREEN_HEIGHT:
+                    break
+
+                # Stop if sensor detects off-track
+                if map_image.get_at((x, y)) != BLACK:
+                    self.sensors.append((x, y))
+                    break
+            else:
+                # If there is no collision
+                self.sensors.append((x, y))
 
 
 def eval_genomes(genomes, config):
