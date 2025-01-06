@@ -58,7 +58,9 @@ class Car:
         self.fitness += 0.1
 
     def detect_collision(self, map_image):
-        pass
+        # Check pixel color at the car'a center
+        car_color = map_image.get_at((int(self.x), int(self.y)))
+        return car_color != BLACK
 
     def cast_sensors(self, map_image):
         pass
