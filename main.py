@@ -2,6 +2,7 @@ import pygame
 import random
 import neat
 import os
+import math
 
 pygame.init()
 
@@ -109,21 +110,32 @@ def eval_genomes(genomes, config):
                 exit()
 
         for i, car in enumerate(cars):
+            car.cast_sensors(map_image)
+
             # Neural Network inputs
-            inputs = [
-                car.x / SCREEN_WIDTH,
-                car.y / SCREEN_HEIGHT,
-                car.angle / 360,
-                random.random(),  # Placeholder sensor input
-                random.random(),
-            ]
+            inputs = []
+            for sensor in car.sensors:
+                dist = math.sqrt((sensor[0] - car.x) ** 2 + (sensor[1] - car.y) ** 2)
+                inputs.append(dist / 200)
+
+            inputs.append(car.angle / 360)
+
+            # Getting outputs and move the car
             output = nets[i].activate(inputs)
             car.move(output)
 
             car.draw()
 
-            if car.fitness >= 1000:  # Example stopping condition
-                running = False
+            # Check if we are off-track
+            if car.detect_collision(map_image):
+                genome = genomes[i][1]
+                genome.fitness = car.fitness
+                cars.pop(i)
+                nets.pop(i)
+                genomes.pop(i)
+
+        if not cars:
+            running = False
 
         pygame.display.flip()
         clock.tick(30)
