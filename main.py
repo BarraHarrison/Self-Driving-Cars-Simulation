@@ -179,14 +179,18 @@ def run_neat(config_file):
     checkpoint = neat.Checkpointer(generation_interval=10, time_interval_seconds=None, filename_prefix="checkpoint-")
     p.add_reporter(checkpoint)
 
-    # Run NEAT for 50 generations
     winner = p.run(eval_genomes, 50)
 
-    # Print the best genome
     print("\nBest Genome:\n{!s}".format(winner))
 
 
 if __name__ == "__main__":
     local_dir = os.path.dirname(__file__)
     config_path = os.path.join(local_dir, "config.txt")
-    run_neat(config_path)
+    checkpoint_file = 'checkpoint-10'  
+    if os.path.exists(checkpoint_file):
+        print(f"Restoring from checkpoint: {checkpoint_file}")
+        p = neat.Checkpointer.restore_checkpoint(checkpoint_file)
+        p.run(eval_genomes, 50)  
+    else:
+        run_neat(config_path)
