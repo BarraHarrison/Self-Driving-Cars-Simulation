@@ -99,11 +99,11 @@ class Car:
 
     def restart(self):
         distance_traveled = math.sqrt((self.x - START_X) ** 2 + (self.y - START_Y) ** 2)
-        self.fitness += distance_traveled
-        self.x = START_X
+        self.fitness += distance_traveled  # Reward for progress
+        self.x = START_X + random.randint(-10, 10)  # Randomize restart position
         self.y = START_Y
-        self.angle = START_ANGLE
-        self.fitness -= 20 # Penalty for going off the track
+        self.angle = START_ANGLE + random.randint(-15, 15)  # Randomize restart angle
+        self.fitness -= 50  # Increase penalty for going off the track
 
 
 def eval_genomes(genomes, config):
@@ -151,10 +151,6 @@ def eval_genomes(genomes, config):
             if car.detect_collision(map_image):
                 car.restart()
 
-        # Stop if all cars are idle (optional, for faster training)
-        if not any(car.fitness > 0 for car in cars):
-            running = False
-
         pygame.display.flip()
         clock.tick(30)
 
@@ -167,15 +163,12 @@ def run_neat(config_file):
         neat.DefaultStagnation,
         config_file,
     )
-    # Initialize the population
     p = neat.Population(config)
 
-    # Add reporters to observe training progress
     p.add_reporter(neat.StdOutReporter(True))
     stats = neat.StatisticsReporter()
     p.add_reporter(stats)
 
-    # Add a Checkpointer reporter to save checkpoints every 10 generations
     checkpoint = neat.Checkpointer(generation_interval=10, time_interval_seconds=None, filename_prefix="checkpoint-")
     p.add_reporter(checkpoint)
 
@@ -187,10 +180,10 @@ def run_neat(config_file):
 if __name__ == "__main__":
     local_dir = os.path.dirname(__file__)
     config_path = os.path.join(local_dir, "config.txt")
-    checkpoint_file = 'checkpoint-10'  
+    checkpoint_file = 'checkpoint-10'
     if os.path.exists(checkpoint_file):
         print(f"Restoring from checkpoint: {checkpoint_file}")
         p = neat.Checkpointer.restore_checkpoint(checkpoint_file)
-        p.run(eval_genomes, 50)  
+        p.run(eval_genomes, 50)
     else:
         run_neat(config_path)
