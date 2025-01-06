@@ -56,32 +56,32 @@ class Car:
             pygame.draw.circle(screen, RED, sensor, 5)
 
     def move(self, output):
-    # Neural network outputs: [left, right, accelerate, decelerate]
-    if output[0] > 0.5:
-        self.angle += 2
-    if output[1] > 0.5:
-        self.angle -= 2
-    if output[2] > 0.5:
-        self.x += self.speed * pygame.math.Vector2(1, 0).rotate(-self.angle).x
-        self.y += self.speed * pygame.math.Vector2(1, 0).rotate(-self.angle).y
-    if output[3] > 0.5:
-        self.x -= self.speed * pygame.math.Vector2(1, 0).rotate(-self.angle).x
-        self.y -= self.speed * pygame.math.Vector2(1, 0).rotate(-self.angle).y
+        # Neural network outputs: [left, right, accelerate, decelerate]
+        if output[0] > 0.5:
+            self.angle += 2
+        if output[1] > 0.5:
+            self.angle -= 2
+        if output[2] > 0.5:
+            self.x += self.speed * pygame.math.Vector2(1, 0).rotate(-self.angle).x
+            self.y += self.speed * pygame.math.Vector2(1, 0).rotate(-self.angle).y
+        if output[3] > 0.5:
+            self.x -= self.speed * pygame.math.Vector2(1, 0).rotate(-self.angle).x
+            self.y -= self.speed * pygame.math.Vector2(1, 0).rotate(-self.angle).y
 
-    # Check for proximity to boundary and adjust behavior
-    boundary_proximity = min(
-        math.sqrt((sensor[0] - self.x) ** 2 + (sensor[1] - self.y) ** 2)
-        for sensor in self.sensors
-    )
+        # Check for proximity to boundary and adjust behavior
+        boundary_proximity = min(
+            math.sqrt((sensor[0] - self.x) ** 2 + (sensor[1] - self.y) ** 2)
+            for sensor in self.sensors
+        )
 
-    if boundary_proximity < 50:  # Close to boundary
-        self.fitness -= 0.1 * (50 - boundary_proximity) / 50  # Small penalty
-        self.speed = 2  # Reduce speed but allow movement
-    else:
-        self.speed = 3  # Restore normal speed
+        if boundary_proximity < 50:  # Close to boundary
+            self.fitness -= 0.1 * (50 - boundary_proximity) / 50  # Small penalty
+            self.speed = 2  # Reduce speed but allow movement
+        else:
+            self.speed = 3  # Restore normal speed
 
-    # Increment fitness for moving forward
-    self.fitness += 0.1
+        # Increment fitness for moving forward
+        self.fitness += 0.1
 
 
 
