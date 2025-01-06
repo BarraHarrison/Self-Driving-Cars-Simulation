@@ -98,11 +98,12 @@ class Car:
                 self.sensors.append((x, y))
 
     def restart(self):
-        # Reset car to starting position and angle
+        distance_traveled = math.sqrt((self.x - START_X) ** 2 + (self.y - START_Y) ** 2)
+        self.fitness += distance_traveled
         self.x = START_X
         self.y = START_Y
         self.angle = START_ANGLE
-        self.fitness -= 10  # Penalize fitness for going off-track
+        self.fitness -= 20 # Penalty for going off the track
 
 
 def eval_genomes(genomes, config):
