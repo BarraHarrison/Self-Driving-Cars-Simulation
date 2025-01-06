@@ -68,8 +68,18 @@ class Car:
             self.x -= self.speed * pygame.math.Vector2(1, 0).rotate(-self.angle).x
             self.y -= self.speed * pygame.math.Vector2(1, 0).rotate(-self.angle).y
 
-        # Increment fitness for moving forward
+        for sensor in self.sensors:
+            dist = math.sqrt((sensor[0] - self.x) ** 2 + (sensor[1] - self.y) ** 2)
+            if dist < 50:  # Danger zone threshold
+                self.fitness -= 0.5
+
+        if any(math.sqrt((sensor[0] - self.x) ** 2 + (sensor[1] - self.y) ** 2) < 50 for sensor in self.sensors):
+            self.speed = 2  
+        else:
+            self.speed = 3  
+
         self.fitness += 0.1
+
 
     def detect_collision(self, map_image):
         # Check the pixel color at the car's center
@@ -78,50 +88,50 @@ class Car:
 
     def cast_sensors(self, map_image):
         self.sensors = []
-        sensor_angles = [-90, -60, -30, 0, 30, 60, 90]  # Sensor angles
+        sensor_angles = [-120, -90, -60, -30, 0, 30, 60, 90, 120]  # Higher resolution sensors
         for angle in sensor_angles:
             sensor_angle = self.angle + angle
             for dist in range(0, 200, 5):  # 200-pixel sensor range
                 x = int(self.x + dist * math.cos(math.radians(sensor_angle)))
                 y = int(self.y - dist * math.sin(math.radians(sensor_angle)))
 
-                # Stop if out of bounds
                 if x < 0 or x >= SCREEN_WIDTH or y < 0 or y >= SCREEN_HEIGHT:
                     break
 
-                # Stop if sensor detects off-track
                 if map_image.get_at((x, y)) != BLACK:
                     self.sensors.append((x, y))
                     break
             else:
-                # If no collision is detected, sensor reaches max range
                 self.sensors.append((x, y))
+
 
     def restart(self):
         distance_traveled = math.sqrt((self.x - START_X) ** 2 + (self.y - START_Y) ** 2)
-        self.fitness += distance_traveled  # Reward for progress
-        self.x = START_X + random.randint(-10, 10)  # Randomize restart position
+        self.fitness += distance_traveled  
+        self.x = START_X + random.randint(-10, 10)  
         self.y = START_Y
-        self.angle = START_ANGLE + random.randint(-15, 15)  # Randomize restart angle
-        self.fitness -= 50  # Increase penalty for going off the track
+        self.angle = START_ANGLE + random.randint(-15, 15)  
+        self.fitness -= 50  
 
 
 def eval_genomes(genomes, config):
     global maps, SCREEN_WIDTH, SCREEN_HEIGHT
 
-    # Use the first map for training
     map_image = maps[0]
 
     cars = []
     nets = []
+    ge = []
+
     for genome_id, genome in genomes:
         net = neat.nn.FeedForwardNetwork.create(genome, config)
         nets.append(net)
         cars.append(Car(START_X, START_Y))
         genome.fitness = 0
+        ge.append(genome)
 
     running = True
-    while running:
+    while running and len(cars) > 0:
         screen.fill(WHITE)
         screen.blit(map_image, (0, 0))
 
@@ -130,29 +140,33 @@ def eval_genomes(genomes, config):
                 pygame.quit()
                 exit()
 
-        for i, car in enumerate(cars):
+        for i in range(len(cars) - 1, -1, -1):
+            car = cars[i]
             car.cast_sensors(map_image)
 
             # Neural network inputs
             inputs = []
             for sensor in car.sensors:
                 dist = math.sqrt((sensor[0] - car.x) ** 2 + (sensor[1] - car.y) ** 2)
-                inputs.append(dist / 200)  # Normalize distance
+                inputs.append(1 - (dist / 200))  # Normalize and invert distance
 
             inputs.append(car.angle / 360)
 
-            # Get outputs and move the car
             output = nets[i].activate(inputs)
             car.move(output)
 
             car.draw()
 
-            # Check if the car goes off-track
+            # Check collision and fitness update
             if car.detect_collision(map_image):
-                car.restart()
+                ge[i].fitness = car.fitness
+                cars.pop(i)
+                nets.pop(i)
+                ge.pop(i)
 
         pygame.display.flip()
         clock.tick(30)
+
 
 
 def run_neat(config_file):
