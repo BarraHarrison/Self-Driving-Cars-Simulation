@@ -10,11 +10,13 @@ pygame.init()
 TEMP_SCREEN_WIDTH, TEMP_SCREEN_HEIGHT = 800, 600
 pygame.display.set_mode((TEMP_SCREEN_WIDTH, TEMP_SCREEN_HEIGHT))
 
+# Load map images and adjust screen size dynamically
 maps = [pygame.image.load(f"map{i}.png").convert() for i in range(1, 6)]
 SCREEN_WIDTH, SCREEN_HEIGHT = maps[0].get_width(), maps[0].get_height()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Self-Driving Car Simulation with NEAT")
 
+# Colors
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
@@ -25,6 +27,7 @@ clock = pygame.time.Clock()
 # Load car sprite
 CAR_SPRITE = pygame.image.load("car.png")
 CAR_WIDTH, CAR_HEIGHT = 50, 30
+
 
 class Car:
     def __init__(self, x, y):
@@ -37,10 +40,12 @@ class Car:
         self.sensors = []
 
     def draw(self):
+        # Draw the car
         rotated_image = pygame.transform.rotate(self.image, -self.angle)
         rect = rotated_image.get_rect(center=(self.x, self.y))
         screen.blit(rotated_image, rect.topleft)
 
+        # Draw sensors
         for sensor in self.sensors:
             pygame.draw.line(screen, RED, (self.x, self.y), sensor, 1)
             pygame.draw.circle(screen, RED, sensor, 5)
@@ -58,20 +63,20 @@ class Car:
             self.x -= self.speed * pygame.math.Vector2(1, 0).rotate(-self.angle).x
             self.y -= self.speed * pygame.math.Vector2(1, 0).rotate(-self.angle).y
 
-        # Increment fitness as the car moves forward
+        # Increment fitness for moving forward
         self.fitness += 0.1
 
     def detect_collision(self, map_image):
-        # Check pixel color at the car'a center
+        # Check the pixel color at the car's center
         car_color = map_image.get_at((int(self.x), int(self.y)))
         return car_color != BLACK
 
     def cast_sensors(self, map_image):
         self.sensors = []
-        sensor_angles = [-60, -30, 0, 30, 60]
+        sensor_angles = [-60, -30, 0, 30, 60]  # Sensor angles
         for angle in sensor_angles:
             sensor_angle = self.angle + angle
-            for dist in range(0, 200, 5): # 200 pixels sensor range
+            for dist in range(0, 200, 5):  # 200-pixel sensor range
                 x = int(self.x + dist * math.cos(math.radians(sensor_angle)))
                 y = int(self.y - dist * math.sin(math.radians(sensor_angle)))
 
@@ -84,14 +89,14 @@ class Car:
                     self.sensors.append((x, y))
                     break
             else:
-                # If there is no collision
+                # If no collision is detected, sensor reaches max range
                 self.sensors.append((x, y))
 
 
 def eval_genomes(genomes, config):
     global maps, SCREEN_WIDTH, SCREEN_HEIGHT
 
-    # Using the first map for training
+    # Use the first map for training
     map_image = maps[0]
 
     cars = []
@@ -115,21 +120,21 @@ def eval_genomes(genomes, config):
         for i, car in enumerate(cars):
             car.cast_sensors(map_image)
 
-            # Neural Network inputs
+            # Neural network inputs
             inputs = []
             for sensor in car.sensors:
                 dist = math.sqrt((sensor[0] - car.x) ** 2 + (sensor[1] - car.y) ** 2)
-                inputs.append(dist / 200)
+                inputs.append(dist / 200)  # Normalize distance
 
             inputs.append(car.angle / 360)
 
-            # Getting outputs and move the car
+            # Get outputs and move the car
             output = nets[i].activate(inputs)
             car.move(output)
 
             car.draw()
 
-            # Check if we are off-track
+            # Check if the car goes off-track
             if car.detect_collision(map_image):
                 genome = genomes[i][1]
                 genome.fitness = car.fitness
@@ -137,11 +142,13 @@ def eval_genomes(genomes, config):
                 nets.pop(i)
                 genomes.pop(i)
 
+        # Stop if all cars are off-track
         if not cars:
             running = False
 
         pygame.display.flip()
         clock.tick(30)
+
 
 def run_neat(config_file):
     config = neat.config.Config(
@@ -159,6 +166,7 @@ def run_neat(config_file):
 
     winner = p.run(eval_genomes, 50)
     print("\nBest Genome:\n{!s}".format(winner))
+
 
 if __name__ == "__main__":
     local_dir = os.path.dirname(__file__)
