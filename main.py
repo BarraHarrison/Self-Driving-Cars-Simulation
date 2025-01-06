@@ -78,7 +78,7 @@ class Car:
 
     def cast_sensors(self, map_image):
         self.sensors = []
-        sensor_angles = [-60, -30, 0, 30, 60]  # Sensor angles
+        sensor_angles = [-90, -60, -30, 0, 30, 60, 90]  # Sensor angles
         for angle in sensor_angles:
             sensor_angle = self.angle + angle
             for dist in range(0, 200, 5):  # 200-pixel sensor range
