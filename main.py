@@ -1,127 +1,43 @@
-# Self-Driving Simulation in Python
-import pygame
+import pygame 
 import random
 import neat
 import os
 
-# Initialize pygame
 pygame.init()
 
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
+maps = [pygame.image.load(f"map{i}.png").convert() for i in range(1, 6)]
 
-WHITE = (255, 255, 255)
-RED = (255, 0, 0)
-BLUE = (0, 0, 255)
-GREEN = (0, 255, 0)
-
+# Set the screen size on the first map
+SCREEN_WIDTH, SCREEN_HEIGHT = maps[0].get_width(), maps[0].get_height()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Self-Driving Car Simulation with NEAT")
 
+# Colours
+WHITE = [255, 255, 255]
+
+# Clock for controlling frame rate
 clock = pygame.time.Clock()
 
-maps = [
-    pygame.image.load(f"map{i}.png").convert() for i in range(1, 6)
-]
-
-current_map_index = 0
+CAR_SPRITE = pygame.image.load("car.png")
+CAR_WIDTH, CAR_HEIGHT = 50, 30
 
 class Car:
-    def __init__(self, x, y, color):
+    def __init__(self, x, y):
         self.x = x
         self.y = y
-        self.color = color
         self.speed = 3
         self.angle = 0
+        self.image = pygame.transform.scale(CAR_SPRITE, (CAR_WIDTH, CAR_HEIGHT))
         self.fitness = 0
 
     def draw(self):
-        car_rect = pygame.Rect(self.x, self.y, 30, 50)
-        pygame.draw.rect(screen, self.color, car_rect)
+        pass
 
-    # Neural Network outputs: [left, right, accelerate, decelerate]
     def move(self, output):
-        if output[0] > 0.5:
-            self.x -= 2
-        if output[1] > 0.5:
-            self.x += 2
-        if output[2] > 0.5:
-            self.y -= 3
-        if output[3] > 0.5:
-            self.y += 3
+        pass
 
-        # Keep car within screen boundaries
-        self.x = max(0, min(SCREEN_WIDTH - 30, self.x))
-        self.y = max(0, min(SCREEN_HEIGHT - 50, self.y))
+    def eval_genomes(genomes, config):
+        pass
 
-        # Increment improvement (fitness) for moving forward
-        # Survival of the fittest if you will
-        self.fitness += 1
-
-
-def eval_genomes(genomes, config):
-    global current_map_index
-
-    cars = []
-    nets = []
-    for genome_id, genome in genomes:
-        net = neat.nn.FeedForwardNetwork.create(genome, config)
-        nets.append(net)
-        cars.append(Car(400, 500, BLUE))
-        genome.fitness = 0
-
-    running = True
-    while running:
-        screen.fill(WHITE)
-        screen.blit(maps[current_map_index], (0, 0))
-
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                exit()
-
-        for i, car in enumerate(cars):
-            inputs = [
-                car.x / SCREEN_WIDTH,
-                car.y / SCREEN_HEIGHT,
-                current_map_index / len(maps),
-                random.random(), #Placeholder sensor input
-                random.random(),
-            ]
-            output = nets[i].activate(inputs)
-            car.move(output)
-
-            # Check collisions with the map
-            if car.y < 0:
-                genomes[i][1].fitness += 1000
-                running = False
-
-            car.draw()
-
-        pygame.display.flip()
-        clock.tick(30)
-
-
-def run_neat(config_file):
-    config = neat.config.Config(
-        neat.DefaultGenome,
-        neat.DefaultReproduction,
-        neat.DefaultSpeciesSet,
-        neat.DefaultStagnation,
-        config_file
-    )
-    p = neat.Population(config)
-
-    p.add_reporter(neat.StdOutReporter(True))
-    stats = neat.StatisticsReporter()
-    p.add_reporter(stats)
-
-    # Run NEAT for 50 generations
-    winner = p.run(eval_genomes, 50)
-
-    print("\nBest genome:\n{!s}".format(winner))
-
-if __name__ == "__main__":
-    local_dir = os.path.dirname(__file__)
-    config_path = os.path.join(local_dir, "config.txt")
-    run_neat(config_path)
+    def run_neat(config_file):
+        pass
