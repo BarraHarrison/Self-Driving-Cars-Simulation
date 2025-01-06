@@ -28,13 +28,18 @@ clock = pygame.time.Clock()
 CAR_SPRITE = pygame.image.load("car.png")
 CAR_WIDTH, CAR_HEIGHT = 50, 30
 
+# Starting position and angle
+START_X = SCREEN_WIDTH // 2
+START_Y = SCREEN_HEIGHT - 100
+START_ANGLE = 0
+
 
 class Car:
-    def __init__(self, x, y):
+    def __init__(self, x, y, angle=START_ANGLE):
         self.x = x
         self.y = y
         self.speed = 3
-        self.angle = 0
+        self.angle = angle
         self.image = pygame.transform.scale(CAR_SPRITE, (CAR_WIDTH, CAR_HEIGHT))
         self.fitness = 0
         self.sensors = []
@@ -92,6 +97,13 @@ class Car:
                 # If no collision is detected, sensor reaches max range
                 self.sensors.append((x, y))
 
+    def restart(self):
+        # Reset car to starting position and angle
+        self.x = START_X
+        self.y = START_Y
+        self.angle = START_ANGLE
+        self.fitness -= 10  # Penalize fitness for going off-track
+
 
 def eval_genomes(genomes, config):
     global maps, SCREEN_WIDTH, SCREEN_HEIGHT
@@ -104,7 +116,7 @@ def eval_genomes(genomes, config):
     for genome_id, genome in genomes:
         net = neat.nn.FeedForwardNetwork.create(genome, config)
         nets.append(net)
-        cars.append(Car(SCREEN_WIDTH // 2, SCREEN_HEIGHT - 100))
+        cars.append(Car(START_X, START_Y))
         genome.fitness = 0
 
     running = True
@@ -136,14 +148,10 @@ def eval_genomes(genomes, config):
 
             # Check if the car goes off-track
             if car.detect_collision(map_image):
-                genome = genomes[i][1]
-                genome.fitness = car.fitness
-                cars.pop(i)
-                nets.pop(i)
-                genomes.pop(i)
+                car.restart()
 
-        # Stop if all cars are off-track
-        if not cars:
+        # Stop if all cars are idle (optional, for faster training)
+        if not any(car.fitness > 0 for car in cars):
             running = False
 
         pygame.display.flip()
