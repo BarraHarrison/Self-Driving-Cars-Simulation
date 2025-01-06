@@ -167,13 +167,22 @@ def run_neat(config_file):
         neat.DefaultStagnation,
         config_file,
     )
+    # Initialize the population
     p = neat.Population(config)
 
+    # Add reporters to observe training progress
     p.add_reporter(neat.StdOutReporter(True))
     stats = neat.StatisticsReporter()
     p.add_reporter(stats)
 
+    # Add a Checkpointer reporter to save checkpoints every 10 generations
+    checkpoint = neat.Checkpointer(generation_interval=10, time_interval_seconds=None, filename_prefix="checkpoint-")
+    p.add_reporter(checkpoint)
+
+    # Run NEAT for 50 generations
     winner = p.run(eval_genomes, 50)
+
+    # Print the best genome
     print("\nBest Genome:\n{!s}".format(winner))
 
 
