@@ -5,13 +5,16 @@ import os
 
 pygame.init()
 
+# Temporary screen initialization for loading images
+screen = pygame.display.set_mode((800, 600))  # Set a temporary screen size for image loading
+pygame.display.set_caption("Self-Driving Car Simulation with NEAT")
+
 # Load map images
 maps = [pygame.image.load(f"map{i}.png").convert() for i in range(1, 6)]
 
-# Set the screen size based on the first map
+# Adjust the screen size based on the first map
 SCREEN_WIDTH, SCREEN_HEIGHT = maps[0].get_width(), maps[0].get_height()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pygame.display.set_caption("Self-Driving Car Simulation with NEAT")
 
 # Colors
 WHITE = (255, 255, 255)
