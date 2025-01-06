@@ -57,6 +57,12 @@ class Car:
         # Increment fitness as the car moves forward
         self.fitness += 0.1
 
+    def detect_collision(self, map_image):
+        pass
+
+    def cast_sensors(self, map_image):
+        pass
+
 
 def eval_genomes(genomes, config):
     global maps, SCREEN_WIDTH, SCREEN_HEIGHT
