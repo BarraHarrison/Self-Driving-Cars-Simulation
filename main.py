@@ -5,19 +5,15 @@ import os
 
 pygame.init()
 
-# Temporary screen initialization for loading images
-screen = pygame.display.set_mode((800, 600))  # Set a temporary screen size for image loading
-pygame.display.set_caption("Self-Driving Car Simulation with NEAT")
-
-# Load map images
 maps = [pygame.image.load(f"map{i}.png").convert() for i in range(1, 6)]
 
-# Adjust the screen size based on the first map
 SCREEN_WIDTH, SCREEN_HEIGHT = maps[0].get_width(), maps[0].get_height()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+pygame.display.set_caption("Self-Driving Car Simulation with NEAT")
 
-# Colors
 WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+RED = (255, 0, 0)
 
 # Clock for controlling frame rate
 clock = pygame.time.Clock()
@@ -34,11 +30,16 @@ class Car:
         self.angle = 0
         self.image = pygame.transform.scale(CAR_SPRITE, (CAR_WIDTH, CAR_HEIGHT))
         self.fitness = 0
+        self.sensors = []
 
     def draw(self):
         rotated_image = pygame.transform.rotate(self.image, -self.angle)
         rect = rotated_image.get_rect(center=(self.x, self.y))
         screen.blit(rotated_image, rect.topleft)
+
+        for sensor in self.sensors:
+            pygame.draw.line(screen, RED, (self.x, self.y), sensor, 1)
+            pygame.draw.circle(screen, RED, sensor, 5)
 
     def move(self, output):
         # Neural network outputs: [left, right, accelerate, decelerate]
@@ -56,9 +57,6 @@ class Car:
         # Increment fitness as the car moves forward
         self.fitness += 0.1
 
-        # Keep the car within screen boundaries
-        self.x = max(0, min(SCREEN_WIDTH, self.x))
-        self.y = max(0, min(SCREEN_HEIGHT, self.y))
 
 def eval_genomes(genomes, config):
     global maps, SCREEN_WIDTH, SCREEN_HEIGHT
