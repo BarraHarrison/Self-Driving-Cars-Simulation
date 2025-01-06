@@ -31,13 +31,63 @@ class Car:
         self.fitness = 0
 
     def draw(self):
-        pass
+        rotated_image = pygame.transform.scale(self.image, -self.angle)
+        rect = rotated_image.get_rect(center=(self.x, self.y))
+        screen.blit(rotated_image, rect.topleft)
 
     def move(self, output):
-        pass
+        # Neural network outputs: [left, right, accelerate, decelerate]
+        if output[0] > 0.5:
+            self.angle += 2
+        if output[1] > 0.5:
+            self.angle -= 2
+        if output[2] > 0.5:
+            self.x += self.speed * pygame.math.Vector2(1, 0).rotate(-self.angle).x
+            self.y += self.speed * pygame.math.Vector2(1, 0).rotate(-self.angle).y
+        if output[3] > 0.5:
+            self.x -= self.speed * pygame.math.Vector2(1, 0).rotate(-self.angle).x
+            self.y -= self.speed * pygame.math.Vector2(1, 0).rotate(-self.angle).y
+
+        # Increment fitness as it moves forward
+        self.fitness += 0.1
+
+        # Keep the car within the screen boundaries
+        self.x = max(0, min(SCREEN_WIDTH, self.x))
+        self.y = max(0, min(SCREEN_HEIGHT, self.y))
 
     def eval_genomes(genomes, config):
-        pass
+        global maps, SCREEN_WIDTH, SCREEN_HEIGHT
+
+        # Using the first map for training
+        map_image = maps[0]
+
+        cars = []
+        nets = []
+        for genome_id, genome in genomes:
+            net = neat.nn.FeedForwardNetwork.create(genome, config)
+            nets.append(net)
+            cars.append(Car(SCREEN_WIDTH // 2, SCREEN_HEIGHT - 100))
+            genome.fitness = 0
+
+        running = True
+        while running:
+            screen.fill(WHITE)
+            screen.blit(map_image, (0, 0))
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    exit()
+
+            for i, car in enumerate(cars):
+                # Neural Network inputs
+                inputs = [
+                    car.x / SCREEN_WIDTH,
+                    car.y / SCREEN_HEIGHT,
+                    car.angle / 360,
+                    random.random(), # Placeholder sensor input
+                    random.random(), 
+                ]
 
     def run_neat(config_file):
         pass
