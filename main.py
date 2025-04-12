@@ -15,9 +15,9 @@ pygame.display.set_caption("Self-Driving Car with NEAT")
 clock = pygame.time.Clock()
 
 MAP_IMAGE = pygame.transform.smoothscale(pygame.image.load(MAP_PATH), (WIN_WIDTH, WIN_HEIGHT))
-CAR_IMAGE = pygame.transform.scale(pygame.image.load(CAR_IMG_PATH), (40, 20))
+CAR_IMAGE = pygame.transform.scale(pygame.image.load(CAR_IMG_PATH), (24, 12))
 
-START_POS = (100, 540)
+START_POS = (400, 540)
 
 class Car:
     def __init__(self):
@@ -55,7 +55,7 @@ class Car:
                 sx = int(self.x + d * math.cos(math.radians(sensor_angle)))
                 sy = int(self.y - d * math.sin(math.radians(sensor_angle)))
                 if 0 <= sx < WIN_WIDTH and 0 <= sy < WIN_HEIGHT:
-                    if map_img.get_at((sx, sy)) == (255, 255, 255, 255):  # White = off track
+                    if map_img.get_at((sx, sy)) == (255, 255, 255, 255):
                         self.sensors.append((sx, sy))
                         break
                 else:
@@ -64,8 +64,10 @@ class Car:
 
     def check_collision(self, map_img):
         try:
-            if map_img.get_at((int(self.x), int(self.y))) == (255, 255, 255, 255):
+            color = map_img.get_at((int(self.x), int(self.y)))
+            if color != (0, 0, 0, 255):
                 self.alive = False
+
         except:
             self.alive = False
 
