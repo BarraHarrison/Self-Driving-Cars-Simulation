@@ -102,7 +102,12 @@ def eval_genomes(genomes, config):
 
             car.cast_sensors(MAP_IMAGE)
 
-            inputs = [math.dist((car.x, car.y), s) / 100 for s in car.sensors] + [car.angle / 360]
+            sensor_distances = [math.dist((car.x, car.y), s) / 100 for s in car.sensors]
+            while len(sensor_distances) < 5:
+                sensor_distances.append(1.0)
+
+            inputs = sensor_distances[:5] + [car.angle / 360]
+
             car.update(nets[i].activate(inputs), MAP_IMAGE)
             ge[i].fitness = car.fitness
             car.draw(screen)
