@@ -74,10 +74,25 @@ class Car:
     def update(self, output, map_img):
         if not self.alive:
             return
-        self.move(output)
-        self.cast_sensors(map_img)
-        self.check_collision(map_img)
-        self.fitness += 0.1
+        
+        if output[0] > 0.5:
+            self.angle += 5
+        if output[1] > 0.5:
+            self.angle -= 5
+        if output[2] > 0.5:
+            self.speed = min(5, self.speed + 0.2)
+        if output[3] > 0.5:
+            self.speed = max(0, self.speed - 0.3)
+
+        dx = math.cos(math.radians(self.angle)) * self.speed
+        dy = -math.sin(math.radians(self.angle)) * self.speed
+        self.x += dx
+        self.y += dy
+
+        if not self.check_collision(map_img):
+            self.fitness += self.speed * 0.1
+        else:
+            self.alive = False
 
 
 def eval_genomes(genomes, config):
