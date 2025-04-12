@@ -6,29 +6,23 @@ import math
 
 pygame.init()
 
-# Set a temporary display mode to allow image conversion
 TEMP_SCREEN_WIDTH, TEMP_SCREEN_HEIGHT = 800, 600
 pygame.display.set_mode((TEMP_SCREEN_WIDTH, TEMP_SCREEN_HEIGHT))
 
-# Load map images and adjust screen size dynamically
 maps = [pygame.image.load(f"map{i}.png").convert() for i in range(1, 6)]
 SCREEN_WIDTH, SCREEN_HEIGHT = maps[0].get_width(), maps[0].get_height()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Self-Driving Car Simulation with NEAT")
 
-# Colors
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 
-# Clock for controlling frame rate
 clock = pygame.time.Clock()
 
-# Load car sprite
 CAR_SPRITE = pygame.image.load("car.png")
 CAR_WIDTH, CAR_HEIGHT = 50, 30
 
-# Starting position and angle
 START_X = SCREEN_WIDTH // 2
 START_Y = SCREEN_HEIGHT - 100
 START_ANGLE = 0
@@ -45,12 +39,10 @@ class Car:
         self.sensors = []
 
     def draw(self):
-        # Draw the car
         rotated_image = pygame.transform.rotate(self.image, -self.angle)
         rect = rotated_image.get_rect(center=(self.x, self.y))
         screen.blit(rotated_image, rect.topleft)
 
-        # Draw sensors
         for sensor in self.sensors:
             pygame.draw.line(screen, RED, (self.x, self.y), sensor, 1)
             pygame.draw.circle(screen, RED, sensor, 5)
@@ -74,28 +66,26 @@ class Car:
             for sensor in self.sensors
         )
 
-        if boundary_proximity < 50:  # Close to boundary
-            self.fitness -= 0.1 * (50 - boundary_proximity) / 50  # Small penalty
-            self.speed = 2  # Reduce speed but allow movement
+        if boundary_proximity < 50:
+            self.fitness -= 0.1 * (50 - boundary_proximity) / 50
+            self.speed = 2
         else:
-            self.speed = 3  # Restore normal speed
+            self.speed = 3 
 
-        # Increment fitness for moving forward
         self.fitness += 0.1
 
 
 
     def detect_collision(self, map_image):
-        # Check the pixel color at the car's center
         car_color = map_image.get_at((int(self.x), int(self.y)))
         return car_color != BLACK
 
     def cast_sensors(self, map_image):
         self.sensors = []
-        sensor_angles = [-120, -90, -60, -30, 0, 30, 60, 90, 120]  # Higher resolution sensors
+        sensor_angles = [-120, -90, -60, -30, 0, 30, 60, 90, 120]
         for angle in sensor_angles:
             sensor_angle = self.angle + angle
-            for dist in range(0, 200, 5):  # 200-pixel sensor range
+            for dist in range(0, 200, 5):
                 x = int(self.x + dist * math.cos(math.radians(sensor_angle)))
                 y = int(self.y - dist * math.sin(math.radians(sensor_angle)))
 
@@ -152,7 +142,7 @@ def eval_genomes(genomes, config):
             inputs = []
             for sensor in car.sensors:
                 dist = math.sqrt((sensor[0] - car.x) ** 2 + (sensor[1] - car.y) ** 2)
-                inputs.append(1 - (dist / 200))  # Normalize and invert distance
+                inputs.append(1 - (dist / 200))
 
             inputs.append(car.angle / 360)
 
@@ -161,7 +151,6 @@ def eval_genomes(genomes, config):
 
             car.draw()
 
-            # Check collision and fitness update
             if car.detect_collision(map_image):
                 ge[i].fitness = car.fitness
                 cars.pop(i)
