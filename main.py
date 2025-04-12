@@ -4,8 +4,8 @@ import os
 import math
 import random
 
-WIN_WIDTH, WIN_HEIGHT = 800, 600
-MAP_PATH = "assets/map1.png"
+WIN_WIDTH, WIN_HEIGHT = 768, 768
+MAP_PATH = "assets/new_map.png"
 CAR_IMG_PATH = "assets/car.png"
 CHECKPOINT_DIR = "checkpoints"
 
@@ -17,7 +17,7 @@ clock = pygame.time.Clock()
 MAP_IMAGE = pygame.transform.smoothscale(pygame.image.load(MAP_PATH), (WIN_WIDTH, WIN_HEIGHT))
 CAR_IMAGE = pygame.transform.scale(pygame.image.load(CAR_IMG_PATH), (24, 12))
 
-START_POS = (400, 540)
+START_POS = (WIN_WIDTH // 2, WIN_HEIGHT - 80)
 
 class Car:
     def __init__(self):
