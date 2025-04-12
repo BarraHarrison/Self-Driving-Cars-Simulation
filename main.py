@@ -31,8 +31,9 @@ RED = (255, 0, 0)
 
 clock = pygame.time.Clock()
 
-CAR_SPRITE = pygame.image.load("car.png")
-CAR_WIDTH, CAR_HEIGHT = 50, 30
+CAR_WIDTH, CAR_HEIGHT = 30, 20
+CAR_SPRITE = pygame.transform.scale(pygame.image.load("car.png"), (CAR_WIDTH, CAR_HEIGHT))
+
 
 START_X = SCREEN_WIDTH // 2
 START_Y = SCREEN_HEIGHT - 100
