@@ -36,7 +36,7 @@ CAR_SPRITE = pygame.transform.scale(pygame.image.load("car.png"), (CAR_WIDTH, CA
 
 
 START_X = SCREEN_WIDTH // 2
-START_Y = SCREEN_HEIGHT - 100
+START_Y = SCREEN_HEIGHT // 4
 START_ANGLE = 0
 
 
@@ -44,7 +44,7 @@ class Car:
     def __init__(self, x, y, angle=START_ANGLE):
         self.x = x
         self.y = y
-        self.speed = 3
+        self.speed = 2
         self.angle = angle
         self.image = pygame.transform.scale(CAR_SPRITE, (CAR_WIDTH, CAR_HEIGHT))
         self.fitness = 0
