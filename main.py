@@ -97,7 +97,7 @@ class Car:
         sensor_angles = [-120, -90, -60, -30, 0, 30, 60, 90, 120]
         for angle in sensor_angles:
             sensor_angle = self.angle + angle
-            for dist in range(0, 200, 5):
+            for dist in range(0, 100, 5):
                 x = int(self.x + dist * math.cos(math.radians(sensor_angle)))
                 y = int(self.y - dist * math.sin(math.radians(sensor_angle)))
 
