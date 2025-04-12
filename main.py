@@ -63,13 +63,10 @@ class Car:
                     break
 
     def check_collision(self, map_img):
-        try:
-            color = map_img.get_at((int(self.x), int(self.y)))
-            if color != (0, 0, 0, 255):
-                self.alive = False
-
-        except:
-            self.alive = False
+        if int(self.x) < 0 or int(self.x) >= map_img.get_width() or int(self.y) < 0 or int(self.y) >= map_img.get_height():
+            return True
+        color = map_img.get_at((int(self.x), int(self.y)))
+        return color != (0, 0, 0, 255)
 
     def update(self, output, map_img):
         if not self.alive:
