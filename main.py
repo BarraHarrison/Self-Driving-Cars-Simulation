@@ -9,8 +9,19 @@ pygame.init()
 TEMP_SCREEN_WIDTH, TEMP_SCREEN_HEIGHT = 800, 600
 pygame.display.set_mode((TEMP_SCREEN_WIDTH, TEMP_SCREEN_HEIGHT))
 
-maps = [pygame.image.load(f"map{i}.png").convert() for i in range(1, 6)]
-SCREEN_WIDTH, SCREEN_HEIGHT = maps[0].get_width(), maps[0].get_height()
+NEW_MAP_WIDTH = 800
+NEW_MAP_HEIGHT = 600
+
+maps = [
+    pygame.transform.smoothscale(
+        pygame.image.load(f"map{i}.png").convert(), 
+        (NEW_MAP_WIDTH, NEW_MAP_HEIGHT)
+    )
+    for i in range(1, 6)
+]
+
+
+SCREEN_WIDTH, SCREEN_HEIGHT = NEW_MAP_WIDTH, NEW_MAP_HEIGHT
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Self-Driving Car Simulation with NEAT")
 
