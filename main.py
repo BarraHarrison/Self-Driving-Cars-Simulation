@@ -100,9 +100,10 @@ def eval_genomes(genomes, config):
             if not car.alive:
                 continue
 
-            car.update(nets[i].activate(
-                [math.dist((car.x, car.y), s) / 100 for s in car.sensors] + [car.angle / 360]
-            ), MAP_IMAGE)
+            car.cast_sensors(MAP_IMAGE)
+
+            inputs = [math.dist((car.x, car.y), s) / 100 for s in car.sensors] + [car.angle / 360]
+            car.update(nets[i].activate(inputs), MAP_IMAGE)
             ge[i].fitness = car.fitness
             car.draw(screen)
 

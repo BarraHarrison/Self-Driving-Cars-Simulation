@@ -11,7 +11,8 @@ initial_connection     = full
 num_hidden             = 0
 num_inputs             = 6
 num_outputs            = 4
-enabled_default        = True
+enabled_default         = True
+enabled_mutate_rate     = 0.01
 
 # Activation / Aggregation
 activation_default     = tanh
