@@ -26,9 +26,12 @@ class Car:
         screen.blit(rotated, rect.topleft)
 
     def draw_sensors(self, screen):
+        """
+        Draw green lines from the car to each sensor endpoint for debugging.
+        """
         for sensor in self.sensors:
-            pygame.draw.line(screen, (255, 0, 0), (self.x, self.y), sensor, 2)
-            pygame.draw.circle(screen, (0, 255, 0), (int(sensor[0]), int(sensor[1])), 4)
+            pygame.draw.line(screen, (0, 255, 0), (self.x, self.y), sensor, 2)
+            pygame.draw.circle(screen, (0, 255, 0), sensor, 3)
 
     def cast_sensors(self, map_image):
         """

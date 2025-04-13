@@ -59,6 +59,7 @@ def main():
         while car.alive and step < 500:
             screen.blit(MAP_IMAGE, (0, 0))
             car.draw(screen)
+            car.draw_sensors(screen)
             pygame.display.flip()
 
             car.cast_sensors(MAP_IMAGE)
