@@ -151,6 +151,41 @@ def eval_genomes(genomes, config):
         pygame.display.update()
         clock.tick(60)
 
+def replay_genome(config_path):
+    config = neat.Config(
+        neat.DefaultGenome,
+        neat.DefaultReproduction,
+        neat.DefaultSpeciesSet,
+        neat.DefaultStagnation,
+        config_path
+    )
+
+    with open("best_genome.pkl", "rb") as f:
+        genome = pickle.load(f)
+
+    net = neat.nn.FeedForwardNetwork.create(genome, config)
+    car = Car()
+
+    run = True
+    while run and car.alive:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+
+        screen.blit(MAP_IMAGE, (0, 0))
+        car.cast_sensors(MAP_IMAGE)
+
+        sensor_distances = [math.dist((car.x, car.y), s) / 100 for s in car.sensors]
+        while len(sensor_distances) < 5:
+            sensor_distances.append(1.0)
+
+        inputs = sensor_distances[:5] + [car.angle / 360]
+        car.update(net.activate(inputs), MAP_IMAGE)
+
+        car.draw(screen)
+        pygame.display.update()
+        clock.tick(60)
 
 
 
