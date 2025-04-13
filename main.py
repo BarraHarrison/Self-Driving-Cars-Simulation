@@ -17,7 +17,7 @@ clock = pygame.time.Clock()
 MAP_IMAGE = pygame.transform.smoothscale(pygame.image.load(MAP_PATH), (WIN_WIDTH, WIN_HEIGHT))
 CAR_IMAGE = pygame.transform.scale(pygame.image.load(CAR_IMG_PATH), (24, 12))
 
-START_POS = (WIN_WIDTH // 2, WIN_HEIGHT - 80)
+START_POS = (395, 705)
 generation_count = 0
 
 
