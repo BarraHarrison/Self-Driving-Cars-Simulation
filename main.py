@@ -60,7 +60,7 @@ def main():
 
             state = agent.get_state(car)
             action = agent.choose_action(state)
-            reward = car.update(action)
+            reward = car.update(action, MAP_IMAGE)
             next_state = agent.get_state(car)
             agent.update_q(state, action, reward, next_state)
 

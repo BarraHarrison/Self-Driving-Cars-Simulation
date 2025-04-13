@@ -6,7 +6,12 @@ class Car:
         self.x, self.y = start_pos
         self.angle = 0
         self.speed = 2
-        self.image = pygame.transform.rotate(pygame.image.load("assets/car.png"), -self.angle)
+        
+        raw_car = pygame.image.load("assets/car.png").convert_alpha()
+        scaled_car = pygame.transform.scale(raw_car, (24, 12))
+        self.image = pygame.transform.rotate(scaled_car, -self.angle)
+
+
         self.sensors = []
         self.alive = True
         self.distance_traveled = 0
@@ -19,6 +24,12 @@ class Car:
         rotated = pygame.transform.rotate(self.image, self.angle)
         rect = rotated.get_rect(center=(self.x, self.y))
         screen.blit(rotated, rect.topleft)
+
+    def draw_sensors(self, screen):
+        for sensor in self.sensors:
+            pygame.draw.line(screen, (255, 0, 0), (self.x, self.y), sensor, 2)
+            pygame.draw.circle(screen, (0, 255, 0), (int(sensor[0]), int(sensor[1])), 4)
+
 
     def move_forward(self):
         rad = math.radians(self.angle)
