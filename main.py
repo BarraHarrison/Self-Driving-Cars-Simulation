@@ -72,7 +72,7 @@ class Car:
         color = map_img.get_at((int(self.x), int(self.y)))
         return color != (0, 0, 0, 255)
 
-    def update(self, output, map_img):
+    def update(self, output, map_image):
         print("Network output:", output)
         if not self.alive:
             return
@@ -88,16 +88,13 @@ class Car:
             self.x -= self.speed * math.cos(math.radians(self.angle))
             self.y -= self.speed * math.sin(math.radians(self.angle))
 
-        dx = math.cos(math.radians(self.angle)) * self.speed
-        dy = -math.sin(math.radians(self.angle)) * self.speed
-        self.x += dx
-        self.y += dy
+        distance = math.dist((self.x, self.y), self.prev_position)
+        self.distance_traveled += distance
+        self.prev_position = (self.x, self.y)
 
-        if not self.check_collision(map_img):
-            self.fitness += self.speed * 0.1
-        else:
+        pixel_color = map_image.get_at((int(self.x), int(self.y)))
+        if pixel_color != (0, 0, 0):
             self.alive = False
-
 
 def eval_genomes(genomes, config):
     global generation_count
