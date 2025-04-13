@@ -18,7 +18,7 @@ CAR_IMAGE = pygame.transform.scale(pygame.image.load(CAR_IMG_PATH), (24, 12))
 START_POS = (420, 640)
 
 
-def main():
+def main(action):
     car = Car()
     running = True
 
@@ -29,7 +29,7 @@ def main():
 
         screen.blit(MAP_IMAGE, (0, 0))
 
-        car.update_manual(MAP_IMAGE)
+        car.update(action, MAP_IMAGE)
         car.draw(screen)
 
         pygame.display.update()

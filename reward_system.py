@@ -1,4 +1,3 @@
-# reward_system.py
 
 def compute_reward(car, map_image):
     """

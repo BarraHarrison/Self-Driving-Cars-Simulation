@@ -1,1 +1,66 @@
-# Going to contain Car class with properties and methods
+import pygame
+import math
+
+class Car:
+    def __init__(self, start_pos):
+        self.x, self.y = start_pos
+        self.angle = 0
+        self.speed = 2
+        self.image = pygame.transform.rotate(pygame.image.load("assets/car.png"), -self.angle)
+        self.sensors = []
+        self.alive = True
+        self.distance_traveled = 0
+        self.prev_position = (self.x, self.y)
+        self.velocity = 0
+        self.max_speed = 4
+        self.rotation_speed = 4
+
+    def draw(self, screen):
+        rotated = pygame.transform.rotate(self.image, self.angle)
+        rect = rotated.get_rect(center=(self.x, self.y))
+        screen.blit(rotated, rect.topleft)
+
+    def move_forward(self):
+        rad = math.radians(self.angle)
+        self.x += self.speed * math.cos(rad)
+        self.y -= self.speed * math.sin(rad)
+        self.distance_traveled += math.dist((self.x, self.y), self.prev_position)
+        self.prev_position = (self.x, self.y)
+
+    def rotate_left(self):
+        self.angle += self.rotation_speed
+
+    def rotate_right(self):
+        self.angle -= self.rotation_speed
+
+    def update(self, action, map_image):
+        if not self.alive:
+            return
+
+        if action[0] > 0.5:
+            self.move_forward()
+        if action[1] > 0.5:
+            self.velocity = max(self.velocity - 0.2, -self.max_speed)
+        if action[2] > 0.5:
+            self.rotate_left()
+        if action[3] > 0.5:
+            self.rotate_right()
+
+        reward = self.compute_reward(map_image)
+        return reward
+
+    def compute_reward(self, map_image):
+        reward = 1
+
+        try:
+            pixel = map_image.get_at((int(self.x), int(self.y)))[:3]
+            if pixel[0] < 50 and pixel[1] < 50 and pixel[2] < 50:
+                reward += 10
+            else:
+                reward -= 100
+                self.alive = False
+        except IndexError:
+            reward -= 100
+            self.alive = False
+
+        return reward
