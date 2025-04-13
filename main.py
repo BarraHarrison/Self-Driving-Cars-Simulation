@@ -34,6 +34,9 @@ class Car:
         self.fitness = 0
         self.distance_traveled = 0
         self.prev_position = (self.x, self.y)
+        self.velocity = 0
+        self.max_speed = 5
+
 
     def draw(self, win):
         rotated = pygame.transform.rotate(self.image, -self.angle)
