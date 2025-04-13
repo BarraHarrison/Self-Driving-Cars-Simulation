@@ -17,7 +17,7 @@ clock = pygame.time.Clock()
 MAP_IMAGE = pygame.transform.smoothscale(pygame.image.load(MAP_PATH), (WIN_WIDTH, WIN_HEIGHT))
 CAR_IMAGE = pygame.transform.scale(pygame.image.load(CAR_IMG_PATH), (24, 12))
 
-START_POS = (395, 705)
+START_POS = (420, 640)
 generation_count = 0
 
 
@@ -71,6 +71,10 @@ class Car:
             return True
         color = map_img.get_at((int(self.x), int(self.y)))
         return color != (0, 0, 0, 255)
+    
+    def check_off_road(self, map_image):
+        color = map_image.get_at((int(self.x), int(self.y)))[:3]
+        return color != (0, 0, 0)
 
     def update(self, output, map_image):
         print("Network output:", output)
@@ -92,9 +96,9 @@ class Car:
         self.distance_traveled += distance
         self.prev_position = (self.x, self.y)
 
-        pixel_color = map_image.get_at((int(self.x), int(self.y)))
-        if pixel_color != (0, 0, 0):
+        if self.check_off_road(map_image):
             self.alive = False
+            self.distance_traveled *= 0.3
 
 def eval_genomes(genomes, config):
     global generation_count
