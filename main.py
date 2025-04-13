@@ -18,6 +18,8 @@ MAP_IMAGE = pygame.transform.smoothscale(pygame.image.load(MAP_PATH), (WIN_WIDTH
 CAR_IMAGE = pygame.transform.scale(pygame.image.load(CAR_IMG_PATH), (24, 12))
 
 START_POS = (WIN_WIDTH // 2, WIN_HEIGHT - 80)
+generation_count = 0
+
 
 class Car:
     def __init__(self):
@@ -93,6 +95,13 @@ class Car:
 
 
 def eval_genomes(genomes, config):
+    global generation_count
+    generation_count += 1
+
+    if generation_count % 10 == 0:
+        print(f"🔁 Debug pause: Generation {generation_count}")
+        pygame.time.delay(500)
+
     nets, cars, ge = [], [], []
     for genome_id, genome in genomes:
         net = neat.nn.FeedForwardNetwork.create(genome, config)
@@ -128,6 +137,7 @@ def eval_genomes(genomes, config):
 
         pygame.display.update()
         clock.tick(60)
+
 
 
 def run_neat(config_file):
