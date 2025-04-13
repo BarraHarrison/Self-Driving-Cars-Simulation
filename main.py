@@ -36,6 +36,7 @@ class Car:
         self.prev_position = (self.x, self.y)
         self.velocity = 0
         self.max_speed = 5
+        self.rotation_speed = 5
 
 
     def draw(self, win):
@@ -91,13 +92,13 @@ class Car:
             self.initial_boost_frames -= 1
 
         if output[0] > 0.5:
-            self.angle -= self.rotation_speed
+            self.angle -= self.rotation_speed * self.velocity / self.max_speed
         if output[1] > 0.5:
-            self.angle += self.rotation_speed
+            self.angle += self.rotation_speed * self.velocity / self.max_speed
         if output[2] > 0.5:
             self.velocity = min(self.velocity + 0.2, self.max_speed)
         if output[3] > 0.5:
-            self.velocity = max(self.velocity - 0.3, -self.max_speed / 2)
+            self.velocity = max(self.velocity - 0.3, 0)
 
 
         distance = math.dist((self.x, self.y), self.prev_position)
