@@ -67,6 +67,9 @@ def main():
             total_reward += reward
             step += 1
             clock.tick(FPS)
+            car.draw(screen)
+            car.draw_sensors(screen)
+
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
