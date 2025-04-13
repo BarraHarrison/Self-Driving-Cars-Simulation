@@ -30,7 +30,7 @@ class Car:
         self.sensors = []
         self.alive = True
         self.fitness = 0
-        self.distance_travelled = 0
+        self.distance_traveled = 0
         self.prev_position = (self.x, self.y)
 
     def draw(self, win):
