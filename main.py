@@ -1,42 +1,46 @@
+import numpy as np
 import pygame
-import math
-import os
 from car import Car
 
 WIN_WIDTH, WIN_HEIGHT = 768, 768
-MAP_PATH = "assets/new_map.png"
-CAR_IMG_PATH = "assets/car.png"
+START_POS = (420, 640)
 
 pygame.init()
 screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
-pygame.display.set_caption("Self-Driving Car (RL Setup)")
+pygame.display.set_caption("Self-Driving Car RL")
 clock = pygame.time.Clock()
+MAP_IMAGE = pygame.transform.smoothscale(pygame.image.load("assets/new_map.png"), (WIN_WIDTH, WIN_HEIGHT))
 
-MAP_IMAGE = pygame.transform.smoothscale(pygame.image.load(MAP_PATH), (WIN_WIDTH, WIN_HEIGHT))
-CAR_IMAGE = pygame.transform.scale(pygame.image.load(CAR_IMG_PATH), (24, 12))
+action_space = np.array([
+    [1, 0, 0, 0],  
+    [0, 1, 0, 0],  
+    [1, 0, 1, 0],   
+    [1, 0, 0, 1],   
+    [0, 0, 1, 0],  
+    [0, 0, 0, 1],  
+])
 
-START_POS = (420, 640)
+car = Car(START_POS)
+total_reward = 0
+done = False
+step = 0
 
+while not done and car.alive and step < 300:
+    screen.blit(MAP_IMAGE, (0, 0))
 
-def main(action):
-    car = Car()
-    running = True
+    action = action_space[np.random.randint(0, len(action_space))]
+    reward = car.update(action, MAP_IMAGE)
+    total_reward += reward
+    car.draw(screen)
 
-    while running:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
+    pygame.display.flip()
+    clock.tick(30)
 
-        screen.blit(MAP_IMAGE, (0, 0))
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            done = True
 
-        car.update(action, MAP_IMAGE)
-        car.draw(screen)
+    step += 1
 
-        pygame.display.update()
-        clock.tick(60)
-
-    pygame.quit()
-
-
-if __name__ == "__main__":
-    main()
+pygame.quit()
+print("Total Reward:", total_reward)
