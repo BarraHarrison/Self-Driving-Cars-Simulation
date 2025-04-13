@@ -30,6 +30,7 @@ class Car:
         self.image = CAR_IMAGE
         self.sensors = []
         self.alive = True
+        self.initial_boost_frames = 60
         self.fitness = 0
         self.distance_traveled = 0
         self.prev_position = (self.x, self.y)
@@ -82,16 +83,19 @@ class Car:
         if not self.alive:
             return
         
+        if self.initial_boost_frames > 0:
+            self.velocity = min(self.velocity + 0.4, self.max_speed / 2)
+            self.initial_boost_frames -= 1
+
         if output[0] > 0.5:
-            self.angle += 5
+            self.angle -= self.rotation_speed
         if output[1] > 0.5:
-            self.angle -= 5
+            self.angle += self.rotation_speed
         if output[2] > 0.5:
-            self.x += self.speed * math.cos(math.radians(self.angle))
-            self.y += self.speed * math.sin(math.radians(self.angle))
+            self.velocity = min(self.velocity + 0.2, self.max_speed)
         if output[3] > 0.5:
-            self.x -= self.speed * math.cos(math.radians(self.angle))
-            self.y -= self.speed * math.sin(math.radians(self.angle))
+            self.velocity = max(self.velocity - 0.3, -self.max_speed / 2)
+
 
         distance = math.dist((self.x, self.y), self.prev_position)
         self.distance_traveled += distance
