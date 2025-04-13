@@ -8,7 +8,7 @@ class Car:
         self.speed = 2
         
         raw_car = pygame.image.load("assets/car.png").convert_alpha()
-        scaled_car = pygame.transform.scale(raw_car, (24, 12))
+        scaled_car = pygame.transform.scale(raw_car, (20, 10))
         self.image = pygame.transform.rotate(scaled_car, -self.angle)
 
 

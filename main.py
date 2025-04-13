@@ -3,6 +3,7 @@ import sys
 import math
 import random
 import pickle
+import numpy as np
 from car import Car
 from collections import defaultdict
 
@@ -22,6 +23,9 @@ pygame.init()
 screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
 clock = pygame.time.Clock()
 MAP_IMAGE = pygame.transform.smoothscale(pygame.image.load(MAP_PATH), (WIN_WIDTH, WIN_HEIGHT))
+
+def normalize_sensor_values(sensor_distances, max_distance=150):
+    return np.clip(np.array(sensor_distances) / max_distance, 0.0, 1.0)
 
 class QLearningAgent:
     def __init__(self):
@@ -46,7 +50,6 @@ class QLearningAgent:
 
 def main():
     agent = QLearningAgent()
-    car = Car(start_pos=START_POS)
 
     for episode in range(1, 1001):
         car = Car(start_pos=START_POS)
@@ -58,7 +61,11 @@ def main():
             car.draw(screen)
             pygame.display.flip()
 
-            state = agent.get_state(car)
+            car.cast_sensors(MAP_IMAGE)
+            sensor_distances = [math.dist((car.x, car.y), s) for s in car.sensors]
+            sensor_distances = normalize_sensor_values(sensor_distances)
+
+            state = tuple(sensor_distances[:3])  # simplified state
             action = agent.choose_action(state)
             reward = car.update(action, MAP_IMAGE)
             next_state = agent.get_state(car)
@@ -67,9 +74,6 @@ def main():
             total_reward += reward
             step += 1
             clock.tick(FPS)
-            car.draw(screen)
-            car.draw_sensors(screen)
-
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
