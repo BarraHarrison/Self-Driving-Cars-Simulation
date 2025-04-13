@@ -30,6 +30,8 @@ class Car:
         self.sensors = []
         self.alive = True
         self.fitness = 0
+        self.distance_travelled = 0
+        self.prev_position = (self.x, self.y)
 
     def draw(self, win):
         rotated = pygame.transform.rotate(self.image, -self.angle)
@@ -71,6 +73,7 @@ class Car:
         return color != (0, 0, 0, 255)
 
     def update(self, output, map_img):
+        print("Network output:", output)
         if not self.alive:
             return
         
@@ -79,9 +82,11 @@ class Car:
         if output[1] > 0.5:
             self.angle -= 5
         if output[2] > 0.5:
-            self.speed = min(5, self.speed + 0.2)
+            self.x += self.speed * math.cos(math.radians(self.angle))
+            self.y += self.speed * math.sin(math.radians(self.angle))
         if output[3] > 0.5:
-            self.speed = max(0, self.speed - 0.3)
+            self.x -= self.speed * math.cos(math.radians(self.angle))
+            self.y -= self.speed * math.sin(math.radians(self.angle))
 
         dx = math.cos(math.radians(self.angle)) * self.speed
         dy = -math.sin(math.radians(self.angle)) * self.speed
