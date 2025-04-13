@@ -134,7 +134,13 @@ def eval_genomes(genomes, config):
             inputs = sensor_distances[:5] + [car.angle / 360]
 
             car.update(nets[i].activate(inputs), MAP_IMAGE)
-            ge[i].fitness = car.fitness
+
+            if car.alive:
+                ge[i].fitness += 0.1
+                ge[i].fitness += car.distance_traveled * 0.01
+            else:
+                ge[i].fitness -= 1
+
             car.draw(screen)
 
         pygame.display.update()
