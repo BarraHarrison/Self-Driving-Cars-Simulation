@@ -112,11 +112,13 @@ def eval_genomes(genomes, config):
     nets, cars, ge = [], [], []
     for genome_id, genome in genomes:
         net = neat.nn.FeedForwardNetwork.create(genome, config)
-        nets.append(net)
         car = Car()
+        car.cast_sensors(MAP_IMAGE)
+        nets.append(net)
         cars.append(car)
         genome.fitness = 0
         ge.append(genome)
+
 
     run = True
     while run and any(car.alive for car in cars):
