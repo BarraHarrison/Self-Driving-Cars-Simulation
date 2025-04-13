@@ -3,6 +3,7 @@ import neat
 import os
 import math
 import random
+import pickle
 
 WIN_WIDTH, WIN_HEIGHT = 768, 768
 MAP_PATH = "assets/new_map.png"
@@ -112,7 +113,8 @@ def eval_genomes(genomes, config):
     for genome_id, genome in genomes:
         net = neat.nn.FeedForwardNetwork.create(genome, config)
         nets.append(net)
-        cars.append(Car())
+        car = Car()
+        cars.append(car)
         genome.fitness = 0
         ge.append(genome)
 
@@ -130,25 +132,25 @@ def eval_genomes(genomes, config):
                 continue
 
             car.cast_sensors(MAP_IMAGE)
-
             sensor_distances = [math.dist((car.x, car.y), s) / 100 for s in car.sensors]
             while len(sensor_distances) < 5:
                 sensor_distances.append(1.0)
 
             inputs = sensor_distances[:5] + [car.angle / 360]
-
-            car.update(nets[i].activate(inputs), MAP_IMAGE)
+            output = nets[i].activate(inputs)
+            car.update(output, MAP_IMAGE)
 
             if car.alive:
-                ge[i].fitness += 0.1
-                ge[i].fitness += car.distance_traveled * 0.01
+                ge[i].fitness += 0.05
+                ge[i].fitness += car.distance_traveled * 0.02
             else:
-                ge[i].fitness -= 1
+                ge[i].fitness -= 2.0
 
             car.draw(screen)
 
         pygame.display.update()
         clock.tick(60)
+
 
 
 
@@ -167,6 +169,8 @@ def run_neat(config_file):
     p.add_reporter(neat.Checkpointer(generation_interval=10, filename_prefix=os.path.join(CHECKPOINT_DIR, "checkpoint-")))
 
     winner = p.run(eval_genomes, 50)
+    with open("best_genome.pkl", "wb") as f:
+        pickle.dump(winner, f)
     print("Best Genome:", winner)
 
 if __name__ == "__main__":
