@@ -30,6 +30,29 @@ class Car:
             pygame.draw.line(screen, (255, 0, 0), (self.x, self.y), sensor, 2)
             pygame.draw.circle(screen, (0, 255, 0), (int(sensor[0]), int(sensor[1])), 4)
 
+    def cast_sensors(self, map_image):
+        """
+        Casts forward-facing sensors (like rays) to detect distance to the nearest obstacle.
+        Adds 5 sensors: front, front-left, front-right, left, right
+        """
+        self.sensors = []
+        sensor_angles = [-45, -20, 0, 20, 45]
+        max_distance = 150
+
+        for angle_offset in sensor_angles:
+            angle = math.radians(self.angle + angle_offset)
+            for distance in range(0, max_distance, 5):
+                x = int(self.x + distance * math.cos(angle))
+                y = int(self.y - distance * math.sin(angle))
+
+                if x < 0 or x >= map_image.get_width() or y < 0 or y >= map_image.get_height():
+                    break
+
+                pixel = map_image.get_at((x, y))[:3]
+                if sum(pixel) > 60:
+                    break
+            self.sensors.append((x, y))
+
 
     def move_forward(self):
         rad = math.radians(self.angle)
