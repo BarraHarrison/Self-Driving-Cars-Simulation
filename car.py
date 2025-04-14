@@ -23,6 +23,7 @@ class Car:
         self.rotation_speed = 4
         self.path = []
         self.path_history = []
+        self.recovery_mode = 0
 
     def draw(self, screen):
         rotated = pygame.transform.rotate(self.image, self.angle)

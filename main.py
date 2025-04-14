@@ -77,16 +77,25 @@ def main():
 
             state = agent.get_state(car, sensor_distances)
 
-            if car.velocity < 0.5:
+            if car.velocity < 0.5 and car.recovery_mode == 0:
                 direction_hint = car.get_clear_direction(MAP_IMAGE)
+
                 if direction_hint == "left":
                     action = (0, 0, 1, 0)
                 elif direction_hint == "right":
                     action = (0, 0, 0, 1)
                 else:
                     action = (1, 0, 0, 0)
+
+                car.recovery_mode = 10
+
+            elif car.recovery_mode > 0:
+                action = (1, 0, 0, 0)
+                car.recovery_mode -= 1
+
             else:
                 action = agent.choose_action(state)
+
 
             car.update(action, MAP_IMAGE)
             reward = compute_reward(car, MAP_IMAGE)
