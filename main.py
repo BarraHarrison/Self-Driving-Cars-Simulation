@@ -13,9 +13,14 @@ START_POS = (420, 640)
 MAP_PATH = "assets/new_map.png"
 FPS = 60
 
-ACTIONS = [(1, 0, 0, 0), 
-           (0, 0, 1, 0), 
-           (0, 0, 0, 1)] 
+ACTIONS = [
+    (1, 0, 0, 0),  
+    (1, 0, 1, 0),
+    (1, 0, 0, 1),
+    (0, 0, 1, 0),   
+    (0, 0, 0, 1),
+    (0, 0, 0, 0)
+] 
 EPSILON = 0.1
 ALPHA = 0.1
 GAMMA = 0.95
@@ -64,6 +69,7 @@ def main():
 
         while car.alive and step < 500:
             screen.blit(MAP_IMAGE, (0, 0))
+            car.draw_path(screen)
             car.draw(screen)
             car.draw_sensors(screen)
             pygame.display.flip()

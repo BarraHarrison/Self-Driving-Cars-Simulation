@@ -20,6 +20,7 @@ class Car:
         self.velocity = 0
         self.max_speed = 4
         self.rotation_speed = 4
+        self.path = []
 
     def draw(self, screen):
         rotated = pygame.transform.rotate(self.image, self.angle)
@@ -62,7 +63,7 @@ class Car:
         for x, y in self.sensors:
             dist = math.dist((self.x, self.y), (x, y))
             distances.append(min(dist / max_distance, 1.0))
-            
+
         return distances
 
 
@@ -73,6 +74,12 @@ class Car:
         self.y -= self.speed * math.sin(rad)
         self.distance_traveled += math.dist((self.x, self.y), self.prev_position)
         self.prev_position = (self.x, self.y)
+        self.path.append((self.x, self.y))
+
+    def draw_path(self, screen):
+        if len(self.path) > 1:
+            for i in range(1, len(self.path)):
+                pygame.draw.line(screen, (255, 0, 0), self.path[i-1], self.path[i], 2)
 
     def rotate_left(self):
         self.angle += self.rotation_speed
