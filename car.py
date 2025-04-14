@@ -69,7 +69,6 @@ class Car:
         return distances
 
 
-
     def move_forward(self):
         rad = math.radians(self.angle)
         self.x += self.speed * math.cos(rad)
@@ -78,6 +77,33 @@ class Car:
         self.prev_position = (self.x, self.y)
         self.path.append((self.x, self.y))
         self.path_history.append((self.x, self.y))
+
+    def get_clear_direction(self, map_image):
+        """
+        Check which sensor has the highest clear distance and return a direction hint.
+        """
+        distances = []
+        for sensor in self.sensors:
+            try:
+                pixel = map_image.get_at((int(sensor[0]), int(sensor[1])))[:3]
+                if sum(pixel) < 60:
+                    dist = math.dist((self.x, self.y), sensor)
+                else:
+                    dist = 0
+            except IndexError:
+                dist = 0
+            distances.append(dist)
+
+        max_index = distances.index(max(distances))
+        
+        sensor_angle = self.sensor_angles[max_index]
+        if sensor_angle < 0:
+            return "left"
+        elif sensor_angle > 0:
+            return "right"
+        else:
+            return "forward"
+
 
     def draw_path(self, screen):
         if len(self.path) > 1:
@@ -91,7 +117,7 @@ class Car:
 
     def rotate_left(self):
         if self.speed < 1.0:
-            self.angle += self.rotation_speed * 1.5  # sharper turn when slow
+            self.angle += self.rotation_speed * 1.5
         else:
             self.angle += self.rotation_speed
 
