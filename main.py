@@ -76,7 +76,18 @@ def main():
             sensor_distances = normalize_sensor_values(sensor_distances)
 
             state = agent.get_state(car, sensor_distances)
-            action = agent.choose_action(state)
+
+            if car.velocity < 0.5:
+                direction_hint = car.get_clear_direction(MAP_IMAGE)
+                if direction_hint == "left":
+                    action = (0, 0, 1, 0)
+                elif direction_hint == "right":
+                    action = (0, 0, 0, 1)
+                else:
+                    action = (1, 0, 0, 0)
+            else:
+                action = agent.choose_action(state)
+
             car.update(action, MAP_IMAGE)
             reward = compute_reward(car, MAP_IMAGE)
             next_state = agent.get_state(car, sensor_distances)
