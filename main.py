@@ -17,10 +17,10 @@ FPS = 60
 ACTIONS = [
     (1, 0, 0, 0),
     (0, 0, 1, 0),
-    (0, 0, 0, 1), 
-    (0, 1, 0, 0), 
+    (0, 0, 0, 1),
+    (0, 1, 0, 0),
 ] 
-EPSILON = 0.1
+EPSILON = 0.2
 ALPHA = 0.1
 GAMMA = 0.95
 
@@ -44,7 +44,6 @@ class QLearningAgent:
         sensor_state = tuple(normalize_sensor_values(sensor_distances))
         return (x_bin, y_bin, angle_bin, moving) + sensor_state
 
-
     def choose_action(self, state):
         if random.random() < EPSILON:
             return random.choice(ACTIONS)
@@ -57,12 +56,15 @@ class QLearningAgent:
         self.q_table[(state, action)] = current_q + ALPHA * (reward + GAMMA * future_q - current_q)
 
 def main():
+    global EPSILON
     agent = QLearningAgent()
+    best_so_far = 0
 
     for episode in range(1, 1001):
         car = Car(start_pos=START_POS)
         total_reward = 0
         step = 0
+        recent_positions = []
 
         while car.alive and step < 500:
             screen.blit(MAP_IMAGE, (0, 0))
@@ -77,28 +79,33 @@ def main():
 
             state = agent.get_state(car, sensor_distances)
 
-            if car.velocity < 0.5 and car.recovery_mode == 0:
+            if car.speed < 0.1:
                 direction_hint = car.get_clear_direction(MAP_IMAGE)
-
                 if direction_hint == "left":
                     action = (0, 0, 1, 0)
                 elif direction_hint == "right":
                     action = (0, 0, 0, 1)
                 else:
                     action = (1, 0, 0, 0)
-
-                car.recovery_mode = 10
-
-            elif car.recovery_mode > 0:
-                action = (1, 0, 0, 0)
-                car.recovery_mode -= 1
-
             else:
                 action = agent.choose_action(state)
 
-
             car.update(action, MAP_IMAGE)
             reward = compute_reward(car, MAP_IMAGE)
+
+            # Bonus for progress
+            if car.distance_traveled > best_so_far:
+                reward += 20
+                best_so_far = car.distance_traveled
+
+            # Penalize stagnation
+            pos_bin = (int(car.x // 10), int(car.y // 10))
+            recent_positions.append(pos_bin)
+            if len(recent_positions) > 20:
+                recent_positions.pop(0)
+            if recent_positions.count(pos_bin) > 10:
+                reward -= 5
+
             next_state = agent.get_state(car, sensor_distances)
             agent.update_q(state, action, reward, next_state)
 
@@ -113,6 +120,8 @@ def main():
 
         print(f"Episode {episode}: Total Reward = {total_reward:.2f}")
         save_path_if_high_reward(car.path_history, total_reward)
+
+        EPSILON = max(0.05, EPSILON * 0.995)
 
     with open("q_table.pkl", "wb") as f:
         pickle.dump(dict(agent.q_table), f)
