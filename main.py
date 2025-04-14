@@ -6,6 +6,7 @@ import pickle
 import numpy as np
 from car import Car
 from collections import defaultdict
+from reward_system import compute_reward
 
 WIN_WIDTH, WIN_HEIGHT = 768, 768
 START_POS = (420, 640)
@@ -68,7 +69,8 @@ def main():
 
             state = tuple(sensor_distances[:3])
             action = agent.choose_action(state)
-            reward = car.update(action, MAP_IMAGE)
+            car.update(action)
+            reward = compute_reward(car, MAP_IMAGE)
             next_state = agent.get_state(car)
             agent.update_q(state, action, reward, next_state)
 

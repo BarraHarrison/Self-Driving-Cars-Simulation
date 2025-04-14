@@ -83,22 +83,3 @@ class Car:
             self.rotate_left()
         if action[3] > 0.5:
             self.rotate_right()
-
-        reward = self.compute_reward(map_image)
-        return reward
-
-    def compute_reward(self, map_image):
-        reward = 1
-
-        try:
-            pixel = map_image.get_at((int(self.x), int(self.y)))[:3]
-            if pixel[0] < 50 and pixel[1] < 50 and pixel[2] < 50:
-                reward += 10
-            else:
-                reward -= 100
-                self.alive = False
-        except IndexError:
-            reward -= 100
-            self.alive = False
-
-        return reward
