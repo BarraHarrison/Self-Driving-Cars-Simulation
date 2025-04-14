@@ -13,6 +13,7 @@ class Car:
 
 
         self.sensors = []
+        self.sensor_angles = [-60, -30, 0, 30, 60, 90, -90]
         self.alive = True
         self.distance_traveled = 0
         self.prev_position = (self.x, self.y)
@@ -39,10 +40,9 @@ class Car:
         Adds 5 sensors: front, front-left, front-right, left, right
         """
         self.sensors = []
-        sensor_angles = [-45, -20, 0, 20, 45]
         max_distance = 150
 
-        for angle_offset in sensor_angles:
+        for angle_offset in self.sensor_angles:
             angle = math.radians(self.angle + angle_offset)
             for distance in range(0, max_distance, 5):
                 x = int(self.x + distance * math.cos(angle))
@@ -54,6 +54,7 @@ class Car:
                 pixel = map_image.get_at((x, y))[:3]
                 if sum(pixel) > 60:
                     break
+                
             self.sensors.append((x, y))
 
 

@@ -66,7 +66,7 @@ def main():
             sensor_distances = [math.dist((car.x, car.y), s) for s in car.sensors]
             sensor_distances = normalize_sensor_values(sensor_distances)
 
-            state = tuple(sensor_distances[:3])  # simplified state
+            state = tuple(sensor_distances[:3])
             action = agent.choose_action(state)
             reward = car.update(action, MAP_IMAGE)
             next_state = agent.get_state(car)
