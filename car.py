@@ -22,6 +22,7 @@ class Car:
         self.max_speed = 4
         self.rotation_speed = 4
         self.path = []
+        self.path_history = []
 
     def draw(self, screen):
         rotated = pygame.transform.rotate(self.image, self.angle)
@@ -76,35 +77,43 @@ class Car:
         self.distance_traveled += math.dist((self.x, self.y), self.prev_position)
         self.prev_position = (self.x, self.y)
         self.path.append((self.x, self.y))
+        self.path_history.append((self.x, self.y))
 
     def draw_path(self, screen):
         if len(self.path) > 1:
             for i in range(1, len(self.path)):
                 pygame.draw.line(screen, (255, 0, 0), self.path[i-1], self.path[i], 2)
 
+
+    def brake(self):
+        self.speed = max(0, self.speed - 0.5)
+
+
     def rotate_left(self):
-        self.angle += self.rotation_speed
+        if self.speed < 1.0:
+            self.angle += self.rotation_speed * 1.5  # sharper turn when slow
+        else:
+            self.angle += self.rotation_speed
 
     def rotate_right(self):
-        self.angle -= self.rotation_speed
+        if self.speed < 1.0:
+            self.angle -= self.rotation_speed * 1.5
+        else:
+            self.angle -= self.rotation_speed
 
     def update(self, action, map_image):
         if not self.alive:
-            return 0
+            return
 
-        if action == (0, 0, 0, 0):
-            self.velocity = max(self.velocity - 0.1, 0)
-        else:
-            if action[0] > 0.5:
-                self.move_forward()
-            if action[1] > 0.5:
-                self.velocity = max(self.velocity - 0.2, -self.max_speed)
-            if action[2] > 0.5:
-                self.rotate_left()
-            if action[3] > 0.5:
-                self.rotate_right()
+        if action[0] > 0.5:
+            self.move_forward()
+        if action[1] > 0.5:
+            self.brake()
+        if action[2] > 0.5:
+            self.rotate_left()
+        if action[3] > 0.5:
+            self.rotate_right()
 
-        self.distance_traveled += math.dist((self.x, self.y), self.prev_position)
-        self.prev_position = (self.x, self.y)
+        self.cast_sensors(map_image)
 
         return compute_reward(self, map_image)
