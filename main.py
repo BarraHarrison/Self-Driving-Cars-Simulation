@@ -7,6 +7,7 @@ import numpy as np
 from car import Car
 from collections import defaultdict
 from reward_system import compute_reward
+from save_path import save_path_if_high_reward
 
 WIN_WIDTH, WIN_HEIGHT = 768, 768
 START_POS = (420, 640)
@@ -37,12 +38,12 @@ class QLearningAgent:
     def __init__(self):
         self.q_table = defaultdict(float)
 
-    def get_state(self, car):
+    def get_state(self, car, sensor_distances):
         x_bin = int(car.x // 20)
         y_bin = int(car.y // 20)
         angle_bin = int(car.angle // 45)
         moving = 1 if car.velocity > 0.5 else 0
-        sensor_state = tuple(normalize_sensor_values(car.get_normalized_sensor_distances()))
+        sensor_state = tuple(normalize_sensor_values(sensor_distances))
         return (x_bin, y_bin, angle_bin, moving) + sensor_state
 
 
@@ -93,6 +94,7 @@ def main():
                     sys.exit()
 
         print(f"Episode {episode}: Total Reward = {total_reward:.2f}")
+        save_path_if_high_reward(car.path_history, total_reward)
 
     with open("q_table.pkl", "wb") as f:
         pickle.dump(dict(agent.q_table), f)
