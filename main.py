@@ -14,12 +14,12 @@ MAP_PATH = "assets/new_map.png"
 FPS = 60
 
 ACTIONS = [
-    (1, 0, 0, 0),  
+    (1, 0, 0, 0),
+    (0, 0, 1, 0),
+    (0, 0, 0, 1),
+    (0, 0, 0, 0),
     (1, 0, 1, 0),
     (1, 0, 0, 1),
-    (0, 0, 1, 0),   
-    (0, 0, 0, 1),
-    (0, 0, 0, 0)
 ] 
 EPSILON = 0.1
 ALPHA = 0.1
@@ -41,11 +41,9 @@ class QLearningAgent:
         x_bin = int(car.x // 20)
         y_bin = int(car.y // 20)
         angle_bin = int(car.angle // 45)
-
-        sensor_distances = car.get_normalized_sensor_distances()
-        sensor_tuple = tuple(np.round(sensor_distances, 2))
-
-        return (x_bin, y_bin, angle_bin) + sensor_tuple
+        moving = 1 if car.velocity > 0.5 else 0
+        sensor_state = tuple(normalize_sensor_values(car.get_normalized_sensor_distances()))
+        return (x_bin, y_bin, angle_bin, moving) + sensor_state
 
 
     def choose_action(self, state):

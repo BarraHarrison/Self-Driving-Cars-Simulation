@@ -1,5 +1,6 @@
 import pygame
 import math
+from reward_system import compute_reward
 
 class Car:
     def __init__(self, start_pos):
@@ -87,15 +88,23 @@ class Car:
     def rotate_right(self):
         self.angle -= self.rotation_speed
 
-    def update(self, action):
+    def update(self, action, map_image):
         if not self.alive:
-            return
+            return 0
 
-        if action[0] > 0.5:
-            self.move_forward()
-        if action[1] > 0.5:
-            self.velocity = max(self.velocity - 0.2, -self.max_speed)
-        if action[2] > 0.5:
-            self.rotate_left()
-        if action[3] > 0.5:
-            self.rotate_right()
+        if action == (0, 0, 0, 0):
+            self.velocity = max(self.velocity - 0.1, 0)
+        else:
+            if action[0] > 0.5:
+                self.move_forward()
+            if action[1] > 0.5:
+                self.velocity = max(self.velocity - 0.2, -self.max_speed)
+            if action[2] > 0.5:
+                self.rotate_left()
+            if action[3] > 0.5:
+                self.rotate_right()
+
+        self.distance_traveled += math.dist((self.x, self.y), self.prev_position)
+        self.prev_position = (self.x, self.y)
+
+        return compute_reward(self, map_image)
