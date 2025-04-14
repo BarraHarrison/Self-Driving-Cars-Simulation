@@ -36,7 +36,12 @@ class QLearningAgent:
         x_bin = int(car.x // 20)
         y_bin = int(car.y // 20)
         angle_bin = int(car.angle // 45)
-        return (x_bin, y_bin, angle_bin)
+
+        sensor_distances = car.get_normalized_sensor_distances()
+        sensor_tuple = tuple(np.round(sensor_distances, 2))
+
+        return (x_bin, y_bin, angle_bin) + sensor_tuple
+
 
     def choose_action(self, state):
         if random.random() < EPSILON:
@@ -67,7 +72,7 @@ def main():
             sensor_distances = [math.dist((car.x, car.y), s) for s in car.sensors]
             sensor_distances = normalize_sensor_values(sensor_distances)
 
-            state = tuple(sensor_distances[:3])
+            state = agent.get_state(car)
             action = agent.choose_action(state)
             car.update(action)
             reward = compute_reward(car, MAP_IMAGE)

@@ -57,6 +57,15 @@ class Car:
                 
             self.sensors.append((x, y))
 
+    def get_normalized_sensor_distances(self, max_distance=150):
+        distances = []
+        for x, y in self.sensors:
+            dist = math.dist((self.x, self.y), (x, y))
+            distances.append(min(dist / max_distance, 1.0))
+            
+        return distances
+
+
 
     def move_forward(self):
         rad = math.radians(self.angle)
@@ -71,7 +80,7 @@ class Car:
     def rotate_right(self):
         self.angle -= self.rotation_speed
 
-    def update(self, action, map_image):
+    def update(self, action):
         if not self.alive:
             return
 
