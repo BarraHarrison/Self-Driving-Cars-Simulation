@@ -1,13 +1,4 @@
 def compute_reward(car, map_image):
-    """
-    Compute the reward for the current car state.
-    Reward shaping:
-    - +1 for staying alive (per frame)
-    - +10 for being on road (black pixels)
-    - +speed * 0.1 to encourage movement
-    - -100 for going off-road (non-black)
-    """
-
     reward = 1.0
 
     try:
@@ -18,7 +9,14 @@ def compute_reward(car, map_image):
 
     if sum(pixel_color) < 60:
         reward += 10.0
-        reward += car.speed * 0.1 
+        reward += car.speed * 0.1
+
+        if len(car.path_history) > 2:
+            recent = car.path_history[-2:]
+            delta_x = abs(recent[1][0] - recent[0][0])
+            delta_y = abs(recent[1][1] - recent[0][1])
+            if delta_x < 2 and delta_y < 2:
+                reward -= 2.0
     else:
         reward -= 100.0
         car.alive = False
